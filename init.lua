@@ -1,6 +1,11 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 vim.g.mapleader = "`"
 vim.wo.number = true
+vim.o.undofile = true
+vim.o.ignorecase = true
+vim.o.smartcase = true
+vim.o.updatetime = 250
+vim.o.timeoutlen = 300
 
 
 if not vim.loop.fs_stat(lazypath) then
@@ -15,18 +20,14 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-vim.o.tabstop = 4 -- A TAB character looks like 4 spaces
-vim.o.expandtab = true -- Pressing the TAB key will insert spaces instead of a TAB character
-vim.o.softtabstop = 4 -- Number of spaces inserted instead of a TAB character
-vim.o.shiftwidth = 4 -- Number of spaces inserted when indenting
-
 require("lazy").setup({
     {
         -- Directory nav
         'stevearc/oil.nvim',
         opts = {},
         dependencies = { "nvim-tree/nvim-web-devicons" },
-    }, {
+    }, 
+    {
         -- File search
         'nvim-telescope/telescope.nvim', tag = '0.1.5',
          dependencies = { 'nvim-lua/plenary.nvim' },
@@ -55,6 +56,7 @@ require("lazy").setup({
     {
         -- Status line
         'nvim-lualine/lualine.nvim',
+        opts = {},
         dependencies = { 'nvim-tree/nvim-web-devicons' }
     },
     {
@@ -64,11 +66,28 @@ require("lazy").setup({
         lazy = false,
     },
     {
+        "williamboman/mason-lspconfig.nvim",
+        opts = {},
+        lazy = false,
+    },
+    {
+        "neovim/nvim-lspconfig",
+    },
+    {
         -- Commenting
         'numToStr/Comment.nvim',
         opts = { },
         lazy = false,
-    }
+    },
+    {
+        -- Auto detect indent and tab
+        'tpope/vim-sleuth'
+    },
+    { 
+        -- Show pending keybinds
+        'folke/which-key.nvim',
+        opts = {}
+    },
 }, { lazy = true })
     
 
@@ -82,8 +101,5 @@ vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 -- Configure theme
 vim.cmd("colorscheme onedark")
 
--- Configure Mason
-require("mason").setup()
-
--- Configure lualine
-require('lualine').setup()
+-- configure oil
+vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
