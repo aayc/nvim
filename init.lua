@@ -60,15 +60,48 @@ require("lazy").setup({
         dependencies = { 'nvim-tree/nvim-web-devicons' }
     },
     {
+        'windwp/nvim-autopairs',
+        event = "InsertEnter",
+        opts = {} -- this is equalent to setup({}) function
+    },
+    {
         -- Mason for LSP, formatters, and more
         "williamboman/mason.nvim",
         opts = {},
         lazy = false,
-    },
-    {
-        "williamboman/mason-lspconfig.nvim",
-        opts = {},
-        lazy = false,
+        dependencies = {
+            "williamboman/mason-lspconfig.nvim",
+        },
+        config = function()
+            local mason = require("mason")
+            local mason_lspconfig = require("mason-lspconfig")
+
+            mason.setup({
+                ui = {
+                    icons = {
+                        package_installed = "",
+                        package_pending = "...",
+                        package_uninstalled = "",
+                    }
+                }
+            })
+
+            mason_lspconfig.setup({
+                ensure_installed = {
+                    "bashls",
+                    "cssls",
+                    "dockerls",
+                    "gopls",
+                    "html",
+                    "jsonls",
+                    "pyright",
+                    "tsserver",
+                    "vimls",
+                    "yamlls",
+                },
+                automatic_installation = true,
+            })
+        end
     },
     {
         "neovim/nvim-lspconfig",
