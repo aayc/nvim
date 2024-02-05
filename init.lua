@@ -10,6 +10,12 @@ vim.o.timeoutlen = 300
 -- Disable line wrap
 vim.wo.wrap = false
 
+-- Enable relative line numbers
+vim.opt.nu = true
+vim.opt.relativenumber = true
+vim.o.statuscolumn = "%s %l %r"
+
+
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
     "git",
@@ -128,20 +134,20 @@ require("lazy").setup({
             local cmp_nvim_lsp = require("cmp_nvim_lsp")
             local keymap = vim.keymap
             local opts = { noremap = true, silent = true }
-            local on_attach = function(client, bufnr)
+            local on_attach = function(_, bufnr)
                 opts.buffer = bufnr
                 opts.desc = "Show LSP references"
                 keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
 
                 opts.desc = "Go to declaration"
                 keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-                
+
                 opts.desc = "Show LSP definitions"
                 keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
 
                 opts.desc = "Show LSP implementations"
                 keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
-                
+
                 opts.desc = "Show LSP type definitions"
                 keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
 
@@ -153,7 +159,7 @@ require("lazy").setup({
 
                 opts.desc = "Show buffer diagnostics"
                 keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
-                
+
                 opts.desc = "Show line diagnostics"
                 keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
 
