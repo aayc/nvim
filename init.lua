@@ -10,8 +10,6 @@ vim.o.timeoutlen = 300
 -- Disable line wrap
 vim.wo.wrap = false
 
--- List of 
-
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
     "git",
@@ -30,7 +28,7 @@ require("lazy").setup({
         'stevearc/oil.nvim',
         opts = {},
         dependencies = { "nvim-tree/nvim-web-devicons" },
-    }, 
+    },
     {
         -- File search
         'nvim-telescope/telescope.nvim', tag = '0.1.5',
@@ -77,6 +75,7 @@ require("lazy").setup({
         config = function()
             local mason = require("mason")
             local mason_lspconfig = require("mason-lspconfig")
+            local mason_null_ls = require("mason-null-ls")
 
             mason.setup({
                 ui = {
@@ -100,6 +99,18 @@ require("lazy").setup({
                     "tsserver",
                     "vimls",
                     "yamlls",
+                },
+                automatic_installation = true,
+            })
+
+            mason_null_ls.setup({
+                ensure_installed = {
+                    "eslint_d",
+                    "prettier",
+                    "black",
+                    "markdownlint",
+                    "shellcheck",
+                    "write_good",
                 },
                 automatic_installation = true,
             })
@@ -135,7 +146,7 @@ require("lazy").setup({
                 keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
 
                 opts.desc = "See available code actions"
-                keymap.set("n", "gt", vim.lsp.buf.code_action, opts)
+                keymap.set("n", "<leader>.", vim.lsp.buf.code_action, opts)
 
                 opts.desc = "Smart rename"
                 keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
@@ -161,7 +172,7 @@ require("lazy").setup({
 
             local capabilities = cmp_nvim_lsp.default_capabilities()
 
-            for lang in { "html", "tsserver", "pyright", "tailwindcss" } do
+            for _, lang in ipairs({ "html", "tsserver", "pyright", "tailwindcss" }) do
                 lspconfig[lang].setup({
                     capabilities = capabilities,
                     on_attach = on_attach,
@@ -193,12 +204,13 @@ require("lazy").setup({
         -- Auto detect indent and tab
         'tpope/vim-sleuth'
     },
-    { 
+    {
         -- Show pending keybinds
         'folke/which-key.nvim',
         opts = {}
     },
     {
+        -- Completions
         "hrsh7th/nvim-cmp",
         event = "InsertEnter",
         dependencies = {
@@ -238,11 +250,46 @@ require("lazy").setup({
                 })
             })
         end
+    },
+    {
+        -- Formatting and linting
+        "jose-elias-alvarez/null-ls.nvim",
+    },
+    {
+        -- Formatting and linting management
+        "jayp0521/mason-null-ls.nvim",
+        event = { "BufReadPre", "BufNewFile" },
+        dependencies = {
+          "williamboman/mason.nvim",
+          "nvimtools/none-ls.nvim",
+        },
+        config = function()
+            local setup, null_ls = pcall(require, "null-ls")
+            if not setup then
+                return
+            end
+
+            local formatting = null_ls.builtins.formatting
+            local diagnostics = null_ls.builtins.diagnostics
+
+            null_ls.setup({
+                sources = {
+                    formatting.eslint_d,
+                    formatting.prettier,
+                    formatting.black,
+                    diagnostics.eslint_d,
+                    diagnostics.write_good,
+                    diagnostics.markdownlint,
+                    diagnostics.shellcheck,
+                }
+            })
+
+
+        end,
     }
     -- https://github.com/dccsillag/magma-nvim for jupyter
     -- vim fugitive
 }, { lazy = true })
-    
 
 -- Configure telescope
 local builtin = require('telescope.builtin')
